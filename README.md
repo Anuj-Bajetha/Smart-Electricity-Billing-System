@@ -48,7 +48,8 @@ Smart-Electricity-Billing-System/
 
 ## 📸 Screenshots
 
-Add screenshots of your project here to make your repository more attractive and easier to understand.
+Landing Page - https://github.com/Anuj-Bajetha/Smart-Electricity-Billing-System/blob/ccd7bcd8e2175f806a6e7ef5e9aecb58459ab591/Landing%20Page.png
+
 
 ---
 
