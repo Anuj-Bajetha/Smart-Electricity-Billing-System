@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SEBG – Smart Electricity Billing Generator. India's official premium power portal. Instant billing, real-time grid monitoring, and digital consumer services. Powering the nation with precision.">
+  <meta name="keywords" content="SEBG, India Power, Electricity Bill, Nationwide, Power Portal, Smart Billing">
+  <meta name="author" content="SEBG Digital Team">
+  <meta name="theme-color" content="#020812">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>SEBG – Powering India with Innovation ⚡</title>
+  <link rel="icon" href="https://img.icons8.com/isometric/50/flash-on.png
+
+  " type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <div id="cursor-glow" class="cursor-glow"></div>
+  <div id="cursor-dot" class="cursor-dot"></div>
+
+  <!-- LOADER SCREEN -->
+  <div id="loader-screen" class="loader-screen">
+    <canvas id="loader-canvas" class="loader-canvas"></canvas>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="energy-ring ring-1"></div>
+    <div class="energy-ring ring-2"></div>
+    <div class="energy-ring ring-3"></div>
+    <div class="loader-content">
+      <div class="loader-bolt-wrap">
+        <svg class="loader-bolt" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="35,0 5,55 28,55 20,100 55,38 32,38" fill="url(#boltGrad)"/>
+          <defs>
+            <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFD700"/>
+              <stop offset="50%" stop-color="#FF8C00"/>
+              <stop offset="100%" stop-color="#FFD700"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="bolt-glow"></div>
+      </div>
+      <div class="loader-brand">
+        <span class="brand-word" style="--d:0">Power</span>
+        <span class="brand-word" style="--d:1">Corporation</span>
+        <span class="brand-word" style="--d:2">Of</span>
+        <span class="brand-word" style="--d:3">India</span>
+      </div>
+      <div class="loader-tagline">PCOI</div>
+      <div class="arc-reactor">
+        <div class="arc-outer"></div>
+        <div class="arc-middle"></div>
+        <div class="arc-inner"></div>
+        <div class="arc-core"></div>
+        <div class="arc-particles">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="power-bar-wrap">
+        <div class="power-bar-track">
+          <div id="power-bar-fill" class="power-bar-fill"></div>
+          <div class="power-bar-glint"></div>
+        </div>
+        <div class="power-bar-labels">
+          <span>Initializing Systems</span>
+          <span id="loader-pct">0%</span>
+        </div>
+      </div>
+      <div id="loader-status" class="loader-status">Connecting to power grid...</div>
+    </div>
+    <div class="scanlines"></div>
+  </div>
+
+  <canvas id="particle-canvas" class="particle-canvas"></canvas>
+
+  <div id="main-app" class="main-app hidden-app">
+
+    <!-- NAVIGATION -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-inner">
+        <div class="nav-logo">
+          <svg class="nav-bolt" viewBox="0 0 40 65" fill="none">
+            <polygon points="23,0 3,36 18,36 13,65 37,25 21,25" fill="url(#navBolt)"/>
+            <defs>
+              <linearGradient id="navBolt" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FFD700"/>
+                <stop offset="100%" stop-color="#FF8C00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="nav-brand-text">
+            <span class="nav-title">SEBG</span>
+            <span class="nav-sub">Power Portal</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="#hero-section" class="nav-link active" onclick="smoothNav(event,'hero-section')">Home</a>
+          <a href="#about-section" class="nav-link" onclick="smoothNav(event,'about-section')">About</a>
+          <a href="#services-section" class="nav-link" onclick="smoothNav(event,'services-section')">Services</a>
+          <a href="#stats-section" class="nav-link" onclick="smoothNav(event,'stats-section')">Network</a>
+          <a href="#billing-section" class="nav-link" onclick="smoothNav(event,'billing-section')">Billing</a>
+        </div>
+        <button class="nav-cta" onclick="scrollToBilling()">
+          <span>Generate Bill</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </button>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="mobile-menu" id="mobile-menu">
+        <a href="#hero-section" onclick="smoothNav(event,'hero-section');toggleNav()">Home</a>
+        <a href="#about-section" onclick="smoothNav(event,'about-section');toggleNav()">About</a>
+        <a href="#services-section" onclick="smoothNav(event,'services-section');toggleNav()">Services</a>
+        <a href="#stats-section" onclick="smoothNav(event,'stats-section');toggleNav()">Network</a>
+        <a href="#billing-section" onclick="smoothNav(event,'billing-section');toggleNav()">Billing</a>
+      </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="hero-section" class="hero-section">
+      <div class="hero-bg-layer hero-img-layer" style="background-image: url('https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1920&q=85&auto=format&fit=crop')"></div>
+      <div class="hero-bg-layer hero-gradient-layer"></div>
+      <div class="hero-bg-layer hero-grid-layer"></div>
+      <div class="power-lines">
+        <svg class="power-line-svg" viewBox="0 0 1400 800" preserveAspectRatio="none">
+          <path class="pline p1" d="M0,200 Q350,100 700,200 T1400,200"/>
+          <path class="pline p2" d="M0,400 Q350,300 700,400 T1400,400"/>
+          <path class="pline p3" d="M0,600 Q350,500 700,600 T1400,600"/>
+        </svg>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <div class="badge-dot"></div>
+          <span>India's Official Power Portal</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="hero-title-line1">Powering</span>
+          <span class="hero-title-line2">
+            <span class="hero-highlight">India</span>
+          </span>
+          <span class="hero-title-line3">Since 2001</span>
+        </h1>
+        <p class="hero-desc">
+          Precision billing · Real-time grid monitoring · Instant smart invoices<br>
+          Illuminating <strong>1.4 Billion+</strong> lives across the nation.
+        </p>
+        <div class="hero-actions">
+          <button class="hero-btn-primary" id="go-to-billing-btn" onclick="scrollToBilling()">
+            <span class="btn-icon">⚡</span>
+            <span>Generate Invoice</span>
+            <div class="btn-shimmer"></div>
+          </button>
+          <button class="hero-btn-secondary" onclick="smoothNav(event,'about-section')">
+            <span>Learn More</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </button>
+        </div>
+        <div class="scroll-indicator">
+          <div class="scroll-line"></div>
+          <span>Scroll to explore</span>
+        </div>
+      </div>
+      <div class="hero-floaters">
+        <div class="float-card fc-1">
+          <div class="fc-icon">🔌</div>
+          <div class="fc-label">Live Grid Status</div>
+          <div class="fc-value" style="color:#00ff88">Operational</div>
+        </div>
+        <div class="float-card fc-2">
+          <div class="fc-icon">📊</div>
+          <div class="fc-label">Units Today</div>
+          <div class="fc-value">142 <span>MW</span></div>
+        </div>
+        <div class="float-card fc-3">
+          <div class="fc-icon">💡</div>
+          <div class="fc-label">Uptime</div>
+          <div class="fc-value">99.8<span>%</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── PREMIUM MARQUEE STRIP ─── -->
+    <div class="marquee-strip">
+      <div class="marquee-track">
+        <span>⚡ 1.4B+ Consumers Served</span>
+        <span class="msep">◆</span>
+        <span>🗺️ 740+ Districts Powered</span>
+        <span class="msep">◆</span>
+        <span>🌿 100% Renewable Vision</span>
+        <span class="msep">◆</span>
+        <span>📱 Digital First Initiative</span>
+        <span class="msep">◆</span>
+        <span>🏆 23 Years of Excellence</span>
+        <span class="msep">◆</span>
+        <span>🔋 410 GW Installed Capacity</span>
+        <span class="msep">◆</span>
+        <span>⚡ 1.4B+ Consumers Served</span>
+        <span class="msep">◆</span>
+        <span>🗺️ 740+ Districts Powered</span>
+        <span class="msep">◆</span>
+        <span>🌿 100% Renewable Vision</span>
+        <span class="msep">◆</span>
+        <span>📱 Digital First Initiative</span>
+        <span class="msep">◆</span>
+        <span>🏆 23 Years of Excellence</span>
+        <span class="msep">◆</span>
+        <span>🔋 410 GW Installed Capacity</span>
+        <span class="msep">◆</span>
+      </div>
+    </div>
+
+    <!-- ABOUT SECTION -->
+    <section id="about-section" class="about-section reveal-section">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-pill">About SEBG</div>
+          <h2>More Than Just<br><span class="gradient-text">Electricity</span></h2>
+          <p class="section-desc">We power 28 states and 8 Union Territories across the diverse landscapes of India — delivering clean, reliable energy to every home.</p>
+        </div>
+        <div class="about-grid">
+          <div class="about-img-col">
+            <div class="about-img-wrap">
+              <img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?w=1000&q=90&auto=format&fit=crop" alt="Hydroelectric power generation" class="about-img" loading="lazy">
+              <div class="about-img-overlay">
+                <div class="about-img-badge">
+                  <div class="badge-icon">⚡</div>
+                  <div>
+                    <div class="badge-num">23+</div>
+                    <div class="badge-lbl">Years of Service</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- EXTRA PREMIUM PHOTO -->
+            <div class="about-secondary-img-wrap">
+              <img src="https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=600&q=85&auto=format&fit=crop" alt="Landscape with electrical infrastructure" class="about-secondary-img" loading="lazy">
+              <div class="about-secondary-caption">National Grid Network</div>
+            </div>
+          </div>
+          <div class="about-text-col">
+            <h3>Smart Electrivity Billing Generator</h3>
+            <p>SEBG is the unified national billing portal designed to streamline electricity consumption management across the whole of India. We are the central node for digital electricity services.</p>
+            <p>Our mission is to provide 24×7 uninterrupted power visibility, foster renewable energy transitions, and offer a seamless, state-specific digital billing experience to every citizen.</p>
+            <div class="about-features">
+              <div class="af-item">
+                <div class="af-icon">🏔️</div>
+                <div>
+                  <strong>National Power Capacity</strong>
+                  <span>Harnessing nationwide green energy</span>
+                </div>
+              </div>
+              <div class="af-item">
+                <div class="af-icon">🔋</div>
+                <div>
+                  <strong>Smart Grid Network</strong>
+                  <span>AI-powered distribution system</span>
+                </div>
+              </div>
+              <div class="af-item">
+                <div class="af-icon">📱</div>
+                <div>
+                  <strong>Digital First Initiative</strong>
+                  <span>Instant bills & online payments</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── PREMIUM PHOTO SHOWCASE ─── -->
+    <section class="showcase-strip reveal-section">
+      <div class="showcase-inner">
+        <div class="showcase-item">
+          <img src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=85&auto=format&fit=crop" alt="Wind turbines at sunset" loading="lazy">
+          <div class="showcase-overlay">
+            <span>Wind Energy</span>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://images.unsplash.com/photo-1548337138-e87d889cc369?w=800&q=85&auto=format&fit=crop" alt="High voltage power lines at dusk" loading="lazy">
+          <div class="showcase-overlay">
+            <span>Transmission Grid</span>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?w=800&q=85&auto=format&fit=crop" alt="Power plant at night" loading="lazy">
+          <div class="showcase-overlay">
+            <span>Power Generation</span>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=800&q=85&auto=format&fit=crop" alt="Solar panels in mountain region" loading="lazy">
+          <div class="showcase-overlay">
+            <span>Solar Energy</span>
+          </div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://images.unsplash.com/photo-1611365892117-00ac5ef43c90?w=800&q=85&auto=format&fit=crop" alt="Smart meter technology" loading="lazy">
+          <div class="showcase-overlay">
+            <span>Smart Metering</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section id="services-section" class="services-section reveal-section">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-pill">Our Services</div>
+          <h2>Everything You Need<br><span class="gradient-text">In One Portal</span></h2>
+        </div>
+        <div class="services-grid">
+          <div class="service-card" data-index="0">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80&auto=format&fit=crop" alt="Instant billing and electricity invoice generation" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </div>
+              <h3 class="sc-title">Instant Billing</h3>
+              <p class="sc-desc">Generate, preview and download your electricity invoice as a professional PDF in seconds. No queues, no waiting.</p>
+              <div class="sc-tags"><span>PDF Export</span><span>Auto Calc</span><span>QR Pay</span></div>
+            </div>
+          </div>
+          <div class="service-card" data-index="1">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80&auto=format&fit=crop" alt="Power grid monitoring control room" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9 9h.01M15 9h.01M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <h3 class="sc-title">Smart Monitoring</h3>
+              <p class="sc-desc">Real-time grid monitoring with AI-based fault detection and predictive maintenance across all distribution zones.</p>
+              <div class="sc-tags"><span>Real-time</span><span>AI Powered</span><span>24×7</span></div>
+            </div>
+          </div>
+          <div class="service-card" data-index="2">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=600&q=80&auto=format&fit=crop" alt="Solar energy and green power sources" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <h3 class="sc-title">Green Energy</h3>
+              <p class="sc-desc">Committed to 100% renewable energy sourced from robust hydroelectric, solar, and wind resources across the nation.</p>
+              <div class="sc-tags"><span>Hydro</span><span>Solar</span><span>Wind</span></div>
+            </div>
+          </div>
+          <div class="service-card" data-index="3">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1559302504-64aae6ca6b6d?w=600&q=80&auto=format&fit=crop" alt="Power transmission infrastructure at night" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3 class="sc-title">Secure Transmission</h3>
+              <p class="sc-desc">Industry-grade encryption on all consumer data. CERT-In compliant infrastructure with multi-layer redundancy.</p>
+              <div class="sc-tags"><span>Encrypted</span><span>CERT-In</span><span>Redundant</span></div>
+            </div>
+          </div>
+          <div class="service-card" data-index="4">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=600&q=80&auto=format&fit=crop" alt="24x7 customer support helpdesk" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <h3 class="sc-title">24×7 Support</h3>
+              <p class="sc-desc">Round-the-clock customer support via helpline, WhatsApp, and our dedicated portal. Outage resolution within 2 hours.</p>
+              <div class="sc-tags"><span>Helpline</span><span>WhatsApp</span><span>&lt;2hr Fix</span></div>
+            </div>
+          </div>
+          <div class="service-card" data-index="5">
+            <div class="sc-bg"></div>
+            <div class="sc-img-wrap">
+              <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80&auto=format&fit=crop" alt="Consumer connecting with UPCL portal" class="sc-img" loading="lazy">
+            </div>
+            <div class="sc-content">
+              <div class="sc-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" class="sc-icon"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3 class="sc-title">Consumer Connect</h3>
+              <p class="sc-desc">New connections, load enhancement, name transfer — all processed digitally with real-time status tracking from your phone.</p>
+              <div class="sc-tags"><span>New Conn.</span><span>Load Enhanc.</span><span>Digital</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section id="stats-section" class="stats-section reveal-section">
+      <div class="stats-bg-img"></div>
+      <div class="stats-bg-overlay"></div>
+      <div class="section-container stats-inner">
+        <div class="section-header light-header">
+          <div class="section-pill pill-light">Network Strength</div>
+          <h2>Powering Every Corner<br><span class="gold-text">of India</span></h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card" data-target="1400" data-suffix="M+" data-label="Consumers Served" data-icon="👥"></div>
+          <div class="stat-card" data-target="36" data-suffix="" data-label="States & UTs Covered" data-icon="🗺️"></div>
+          <div class="stat-card" data-target="600000" data-suffix="+" data-label="Villages Electrified" data-icon="🏘️"></div>
+          <div class="stat-card" data-target="99" data-suffix=".9%" data-label="Grid Uptime" data-icon="⚡"></div>
+          <div class="stat-card" data-target="410" data-suffix=" GW" data-label="Installed Capacity" data-icon="🔋"></div>
+          <div class="stat-card" data-target="23" data-suffix=" Yrs" data-label="Years of Excellence" data-icon="🏆"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY SECTION -->
+    <section id="gallery-section" class="gallery-section reveal-section">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-pill">Our Infrastructure</div>
+          <h2>Built to Last,<br><span class="gradient-text">Built to Impress</span></h2>
+        </div>
+        <div class="gallery-masonry">
+          <div class="gal-item gi-tall">
+            <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=85&auto=format&fit=crop" alt="High voltage transmission tower" loading="lazy">
+            <div class="gal-caption">High Voltage Transmission</div>
+          </div>
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=600&q=80&auto=format&fit=crop" alt="Solar panel array" loading="lazy">
+            <div class="gal-caption">Solar Farm, AP</div>
+          </div>
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?w=600&q=80&auto=format&fit=crop" alt="Hydroelectric dam gates" loading="lazy">
+            <div class="gal-caption">Hydro Power Station</div>
+          </div>
+          <div class="gal-item gi-wide">
+            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1000&q=80&auto=format&fit=crop" alt="Grid maintenance operation" loading="lazy">
+            <div class="gal-caption">Grid Substation, Mumbai</div>
+          </div>
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=600&q=80&auto=format&fit=crop" alt="Smart power monitoring device" loading="lazy">
+            <div class="gal-caption">Smart Metering</div>
+          </div>
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80&auto=format&fit=crop" alt="Digital network architecture" loading="lazy">
+            <div class="gal-caption">System Control Center</div>
+          </div>
+          <!-- EXTRA PREMIUM PHOTOS in gallery -->
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&q=80&auto=format&fit=crop" alt="Wind turbines at sunset" loading="lazy">
+            <div class="gal-caption">Wind Farm, Gujarat</div>
+          </div>
+          <div class="gal-item gi-wide">
+            <img src="https://images.unsplash.com/photo-1548337138-e87d889cc369?w=1000&q=80&auto=format&fit=crop" alt="Power lines at dusk panorama" loading="lazy">
+            <div class="gal-caption">State-Wide Transmission Network</div>
+          </div>
+          <div class="gal-item">
+            <img src="https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=600&q=80&auto=format&fit=crop" alt="Solar panels mountain region" loading="lazy">
+            <div class="gal-caption">Solar Installation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BILLING SECTION -->
+    <section id="billing-section" class="billing-section reveal-section">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-pill">Bill Generator</div>
+          <h2>Generate Your<br><span class="gradient-text">Electricity Invoice</span></h2>
+          <p class="section-desc">Fill in your consumer details below. Your invoice will be calculated instantly and exported as a professional PDF.</p>
+        </div>
+        <div class="billing-main">
+          <div class="billing-form-wrap">
+            <div class="billing-form-card">
+              <div class="bfc-header">
+                <div class="bfc-icon">⚡</div>
+                <div>
+                  <h3>Consumer Details</h3>
+                  <p>All fields are required</p>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="input-group full-width">
+                  <label for="inp-name">Consumer Name</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="inp-name" type="text" placeholder="e.g. Ramesh Kumar Sharma" autocomplete="name">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group full-width">
+                  <label for="inp-address">Full Address</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="inp-address" type="text" placeholder="Village/Town, District, India" autocomplete="street-address">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-house">House No.</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="inp-house" type="text" placeholder="e.g. H-42B">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-consumer">Consumer ID</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2" stroke-linecap="round"/><path d="M2 10h20" stroke-linecap="round"/></svg>
+                    <input id="inp-consumer" type="text" placeholder="e.g. UK0234567">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-units">Units Consumed (kWh)</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="inp-units" type="number" placeholder="e.g. 250" min="0" max="9999" oninput="previewCalc()">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-state">Select State</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke-linecap="round"/><circle cx="12" cy="10" r="3" stroke-linecap="round"/></svg>
+                    <select id="inp-state" class="premium-select" onchange="updateDistricts()">
+                      <option value="">Loading States...</option>
+                    </select>
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-district">Select District</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke-linecap="round"/><circle cx="12" cy="10" r="3" stroke-linecap="round"/></svg>
+                    <select id="inp-district" class="premium-select">
+                      <option value="">Choose State First</option>
+                    </select>
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="inp-month">Billing Month</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" stroke-linecap="round"/><path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/></svg>
+                    <input id="inp-month" type="month">
+                    <div class="input-glow"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Live preview -->
+              <div class="calc-preview" id="calc-preview">
+                <div class="cp-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 2.5 2 2.5-2 3.5 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Live Estimate
+                </div>
+                <div class="cp-grid">
+                  <div class="cp-row"><span>Energy Charges</span><span id="prev-energy">₹ —</span></div>
+                  <div class="cp-row"><span>Fixed Charges</span><span>₹ 50.00</span></div>
+                  <div class="cp-row"><span>GST (18%)</span><span id="prev-gst">₹ —</span></div>
+                  <div class="cp-row total-row"><span>Total Payable</span><span id="prev-total">₹ —</span></div>
+                </div>
+              </div>
+              <!-- Tariff info -->
+              <div class="tariff-info">
+                <div class="ti-title">Tariff Slabs (Dynamic)</div>
+                <div class="ti-grid">
+                  <div class="ti-row"><span class="ti-range">0 – 100 units</span><span class="ti-rate" id="t-rate-1">₹ 4.00/unit</span></div>
+                  <div class="ti-row"><span class="ti-range">101 – 200 units</span><span class="ti-rate" id="t-rate-2">₹ 6.00/unit</span></div>
+                  <div class="ti-row"><span class="ti-range">201+ units</span><span class="ti-rate" id="t-rate-3">₹ 8.00/unit</span></div>
+                </div>
+              </div>
+              <!-- Action buttons -->
+              <div class="form-actions">
+                <button class="form-btn-reset" onclick="resetForm()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9M3 12V7M3 12H8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Reset
+                </button>
+                <button class="form-btn-generate" id="generate-btn" onclick="downloadPDF()">
+                  <span class="gen-btn-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Download Invoice PDF
+                  </span>
+                  <div class="gen-btn-shimmer"></div>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Right: Invoice Preview Panel -->
+          <div class="invoice-preview-panel" id="invoice-panel">
+            <div class="empty-preview" id="empty-preview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <h3>Draft Preview</h3>
+              <p>Fill out the form and click "Download Invoice PDF" to generate the final document.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICE TEMPLATE — rendered off-screen for PDF -->
+    <div id="invoice" class="invoice-template">
+      <div class="watermark">Uttarakhand Power Ltd.</div>
+      <div class="inv-header">
+        <div class="inv-header-left">
+          <div class="inv-logo-row">
+            <svg viewBox="0 0 40 65" class="inv-bolt-svg" fill="none">
+              <polygon points="23,0 3,36 18,36 13,65 37,25 21,25" fill="url(#ibolt)"/>
+              <defs><linearGradient id="ibolt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD700"/><stop offset="100%" stop-color="#FF8C00"/></linearGradient></defs>
+            </svg>
+            <div>
+              <div class="inv-company">Smart Electrivity Billing Generator</div>
+              <div class="inv-company-sub">National Power Digital Underaking</div>
+            </div>
+          </div>
+          <div class="inv-address-text">Corporate Office: Sector 5, Electric Avenue, New Delhi – 110001 | Helpline: 1912</div>
+        </div>
+        <div class="inv-header-right">
+          <div class="inv-title-badge">ELECTRICITY INVOICE</div>
+          <div class="inv-invoice-no" id="i-bill-display">INV-000000</div>
+        </div>
+      </div>
+      <div class="inv-divider"></div>
+      <div class="inv-two-col">
+        <div class="inv-col">
+          <div class="inv-col-title">Consumer Information</div>
+          <table class="inv-info-table">
+            <tr><td>Consumer Name</td><td id="i-name">—</td></tr>
+            <tr><td>Address</td><td id="i-address">—</td></tr>
+            <tr><td>House No.</td><td id="i-house">—</td></tr>
+            <tr><td>Consumer ID</td><td id="i-consumer">—</td></tr>
+            <tr><td>State</td><td id="i-state-disp">—</td></tr>
+            <tr><td>District</td><td id="i-dist-disp">—</td></tr>
+          </table>
+        </div>
+        <div class="inv-col">
+          <div class="inv-col-title">Billing Information</div>
+          <table class="inv-info-table">
+            <tr><td>Invoice No.</td><td id="i-bill">—</td></tr>
+            <tr><td>Invoice Date</td><td id="i-date">—</td></tr>
+            <tr><td>Billing Month</td><td id="i-month">—</td></tr>
+            <tr><td>Due Date</td><td id="i-due">—</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="inv-section-title">⚡ Charges Summary</div>
+      <table class="inv-charges-table">
+        <thead>
+          <tr><th>Description</th><th>Units / Rate</th><th>Amount (₹)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Energy Charges (Slab Rate)</td><td id="i-units-rate">—</td><td id="i-energy">—</td></tr>
+          <tr><td>Fixed Charges</td><td>—</td><td>50.00</td></tr>
+          <tr><td>GST @ 18%</td><td>18%</td><td id="i-gst">—</td></tr>
+          <tr class="inv-total-row"><td colspan="2"><strong>Total Amount Payable</strong></td><td id="i-total"><strong>—</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="inv-bottom-cols">
+        <div class="inv-qr-col">
+          <div class="inv-col-title">Scan &amp; Pay (UPI)</div>
+          <img id="qr" class="inv-qr" src="" alt="UPI QR Code" crossorigin="anonymous">
+          <div class="inv-qr-caption">UPI / Online / Counter</div>
+        </div>
+        <div class="inv-payment-col">
+          <div class="inv-col-title">Payment Instructions</div>
+          <ul class="inv-payment-ul">
+            <li>Pay before the due date to avoid late payment surcharge of 2% per month.</li>
+            <li>Payment via UPI, Net Banking, NEFT, or Cash at nearest electricity office.</li>
+            <li>For disputes, contact: billing@sebg.org.in or call 1912.</li>
+            <li>Keep this invoice for future reference.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="inv-footer">
+        <p>This is a computer-generated invoice and does not require a physical signature. | Generated on <span id="i-gen-time"></span></p>
+        <p>Smart Electrivity Billing Generator © <span id="i-year"></span> | CIN: U40109UT2001SGC026479</p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-mesh-bg"></div>
+      <div class="section-container footer-inner">
+        <div class="footer-main-grid">
+          <div class="footer-brand-side">
+            <div class="footer-logo">
+              <svg viewBox="0 0 40 65" fill="none" class="f-bolt">
+                <polygon points="23,0 3,36 18,36 13,65 37,25 21,25" fill="url(#fbolt2)"/>
+                <defs><linearGradient id="fbolt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD700"/><stop offset="100%" stop-color="#FF8C00"/></linearGradient></defs>
+              </svg>
+              <div>
+                <div class="f-brand">SEBG <span class="f-glow-text">PORTAL</span></div>
+                <div class="f-sub">Smart Electricity Billing Generator</div>
+              </div>
+            </div>
+            <p class="f-desc">Empowering India with sustainable energy solutions since 2001. We are the pulse of the nation.</p>
+            <div class="f-social">
+              <a href="#" class="f-social-btn" style="--fclr:#1877F2"><span>FB</span></a>
+              <a href="#" class="f-social-btn" style="--fclr:#1DA1F2"><span>TW</span></a>
+              <a href="#" class="f-social-btn" style="--fclr:#FF0000"><span>YT</span></a>
+              <a href="#" class="f-social-btn" style="--fclr:#E4405F"><span>IN</span></a>
+            </div>
+          </div>
+          <div class="footer-nav-side">
+            <div class="f-nav-group">
+              <h4>Navigation</h4>
+              <ul>
+                <li><a href="#hero-section" onclick="smoothNav(event,'hero-section')">Home Portal</a></li>
+                <li><a href="#about-section" onclick="smoothNav(event,'about-section')">Our Mission</a></li>
+                <li><a href="#services-section" onclick="smoothNav(event,'services-section')">Infrastructure</a></li>
+                <li><a href="#billing-section" onclick="smoothNav(event,'billing-section')">Bill Generator</a></li>
+              </ul>
+            </div>
+            <div class="f-nav-group">
+              <h4>Services</h4>
+              <ul>
+                <li><a href="#">Smart Metering</a></li>
+                <li><a href="#">Grid Analytics</a></li>
+                <li><a href="#">Outage Map</a></li>
+                <li><a href="#">E-Payment</a></li>
+              </ul>
+            </div>
+            <div class="f-nav-group">
+              <h4>Contact</h4>
+              <ul class="f-contact-list">
+                <li><span class="f-icon">📞</span> 1912 (Toll Free)</li>
+                <li><span class="f-icon">✉️</span> support@sebg.org.in</li>
+                <li><span class="f-icon">📍</span> Electric Avenue, New Delhi</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-grid-status">
+          <div class="f-status-item">
+            <div class="f-status-dot green"></div>
+            <div class="f-status-info">
+              <span class="f-status-lbl">Grid Health</span>
+              <span class="f-status-val">OPTIMAL</span>
+            </div>
+          </div>
+          <div class="f-status-item">
+            <div class="f-status-icon">⚡</div>
+            <div class="f-status-info">
+              <span class="f-status-lbl">Live Load</span>
+              <span id="dock-load" class="f-status-val">142.4 MW</span>
+            </div>
+          </div>
+          <div class="f-status-item">
+            <div class="f-status-icon">🛡️</div>
+            <div class="f-status-info">
+              <span class="f-status-lbl">Network Security</span>
+              <span class="f-status-val">SHA-256 ACTIVE</span>
+            </div>
+          </div>
+          <div class="f-status-item">
+            <div class="f-status-icon">🏆</div>
+            <div class="f-status-info">
+              <span class="f-status-lbl">Grid Uptime</span>
+              <span class="f-status-val">99.98%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom-bar">
+        <div class="section-container f-bb-inner">
+          <p>© <span id="footer-year"></span> Smart Electrivity Billing Generator <span class="f-sep">|</span> CIN: U40109UT2001SGC026479</p>
+          <div class="f-legal">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+  </div><!-- /main-app -->
+
+  <script src="script.js"></script>
+</body>
+</html>
